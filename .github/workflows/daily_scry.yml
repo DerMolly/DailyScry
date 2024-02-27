@@ -2,25 +2,26 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: Post a random Magic the Gathering card to telegram and mastodon
+name: Publish Post
 on:
   schedule:
-    - cron: "0 13 * * *"
+    - cron: "30 12 * * *"
   workflow_dispatch:
 
 jobs:
-  format:
-    name: test
+  post:
+    name: post
     runs-on: ubuntu-latest
     steps:
       - uses: robinraju/release-downloader@v1.9
         with:
           latest: true
           fileName: "daily_scry"
+      - run: chmod +x ./daily_scry
       - name: Run daily_scry
-        run: daily_scry --mastodon --telegram
+        run: ./daily_scry --mastodon --telegram
         env:
-          DAILY_SCRY_MASTODON_URL: "{{ secrets.MASTODON_URL }}"
-          DAILY_SCRY_MASTODON_ACCESS_TOKEN: "{{ secrets.MASTODON_ACCESS_TOKEN }}"
-          DAILY_SCRY_TELEGRAM_TOKEN: "{{ secrets.TELEGRAM_TOKEN }}"
-          DAILY_SCRY_TELEGRAM_CHAT_ID: "{{ secrets.TELEGRAM_CHAT_ID }}"
+          DAILY_SCRY_MASTODON_URL: ${{ env.MASTODON_URL }}
+          DAILY_SCRY_MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+          DAILY_SCRY_TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          DAILY_SCRY_TELEGRAM_CHAT_ID: ${{ env.TELEGRAM_CHAT_ID }}
