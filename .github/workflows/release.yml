@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2024 Philip Molares <philip.molares@udo.edu>
+#
+# SPDX-License-Identifier: MIT
+
+on:
+  push:
+    # Pattern matched against refs/tags
+    tags:        
+      - 'v*'           # Push events to every tag not containing /
+  workflow_dispatch:
+
+name: Publish
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup rust
+        uses: ./.github/actions/setup-rust
+        with:
+          RUST_VERSION: stable
+
+      - run: cargo publish --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+
+      - name: build release
+        run: cargo build --release
+
+      - name: create release
+        uses: marvinpinto/action-automatic-releases@v1.2.1
+        id: create_release
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
+          title: "Daily Scry ${{ github.ref }}"
+          files: ./target/release/daily_scry

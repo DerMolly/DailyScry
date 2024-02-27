@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2024 Philip Molares <philip.molares@udo.edu>
+#
+# SPDX-License-Identifier: MIT
+
+name: Setup Rust
+description: "Setups .NET and configures the cache"
+
+inputs:
+  RUST_VERSION:
+    required: true
+    description: "Rust version to install"
+  RUST_COMPONENTS:
+    required: false
+    description: "Which components to install"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ inputs.RUST_VERSION }}
+        components: ${{ inputs.RUST_COMPONENTS }}

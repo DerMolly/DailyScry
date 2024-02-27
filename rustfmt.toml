@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Philip Molares <philip.molares@udo.edu>
+#
+# SPDX-License-Identifier: MIT
+
+edition = "2021"
+reorder_imports = true

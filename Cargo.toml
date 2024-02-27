@@ -1,0 +1,39 @@
+[package]
+name = "daily_scry"
+authors = ["Philip Molares <philip.molares@udo.edu>"]
+description = "Post random scryfall image to mastodon, telegram or stdout"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/DerMolly/DailyScry"
+version = "1.0.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+megalodon = "0.12.4"
+scryfall = "0.16.1"
+string-builder = "0.2.0"
+url = "2.4.1"
+snafu = "0.7.5"
+futures = "0.3.30"
+clap-verbosity-flag = "2.2.0"
+pretty_env_logger = "0.5.0"
+log = "0.4.20"
+dotenv = "0.15.0"
+
+[dependencies.clap]
+version = "4.5.1"
+features = ["derive"]
+
+[dependencies.reqwest]
+version = "0.11"
+features = ["json"]
+
+[dependencies.teloxide-core]
+version = "0.9.1"
+default-features = false
+
+[dependencies.tokio]
+version = "1.32.0"
+features = ["full"]

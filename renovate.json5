@@ -1,0 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2024 Philip Molares <philip.molares@udo.edu>
+ * 
+ * SPDX-License-Identifier: MIT
+ */
+{
+    "extends": ["config:recommended", "schedule:nonOfficeHours", ":labels(dependencies)", ":assignee(DerMolly)"]
+}

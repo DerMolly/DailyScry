@@ -1,0 +1,16 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: DailyScry
+Upstream-Contact: Philip Molares <philip.molares@udo.edu>
+Source: https://github.com/DerMolly/DailyScry
+
+Files: Cargo.lock
+Copyright: 2024 Philip Molares <philip.molares@udo.edu>
+License: MIT
+
+Files: Cargo.toml
+Copyright: 2024 Philip Molares <philip.molares@udo.edu>
+License: MIT
+
+Files: README.md
+Copyright: 2024 Philip Molares <philip.molares@udo.edu>
+License: MIT
