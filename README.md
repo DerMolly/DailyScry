@@ -3,8 +3,9 @@
 This bot allows you to post a random image from [Scryfall][scryfall] to an array of
 services e.g Mastodon, Telegram or locally.
 
-Post can be found at <https://botsin.space/@dailyscry> or <https://telegram.me/DailyScry>
-
+Posts of this bot can be found at
+  - <a rel="me" href="https://botsin.space/@dailyscry">https://botsin.space/@dailyscry</a>
+  - <https://telegram.me/DailyScry>
 ## Installation
 
 ### cargo
@@ -44,12 +45,12 @@ Author: Philip Molares <philip.molares@udo.edu>
 
 ## Configuration
 
-|        environment variable        |                                                       description                                                        |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `DAILY_SCRY_MASTODON_URL`          | The url of the mastodon instance, where your account is hosted.                                                          |
-| `DAILY_SCRY_MASTODON_ACCESS_TOKEN` | The access token for your application.                           |
-| `DAILY_SCRY_TELEGRAM_TOKEN`        | The telegeram bot token you can get from [@BotFather][botfather]                                                         |
-| `DAILY_SCRY_TELEGRAM_CHAT_ID`      | The chat id where the bot should post it's message. This can be found out with [@username_to_id_bot][username_to_id_bot] |
+|        environment variable        |                                                       description                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `DAILY_SCRY_MASTODON_URL`          | The url of the mastodon instance, where your account is hosted.                                                           |
+| `DAILY_SCRY_MASTODON_ACCESS_TOKEN` | The access token for your application.                          							         | 
+| `DAILY_SCRY_TELEGRAM_TOKEN`        | The telegram bot token you can get from [@BotFather][botfather]                                                           |
+| `DAILY_SCRY_TELEGRAM_CHAT_ID`      | The chat id where the bot should post its message. This can be determinded with [@username_to_id_bot][username_to_id_bot] |
 
 [scryfall]: https://scryfall.com
 [releases]: https://github.com/DerMolly/DailyScry/releases
