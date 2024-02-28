@@ -7,8 +7,10 @@ name: Lint
 on:
   push:
     branches: [ main ]
+    paths: ['src/**', 'rustfmt.toml']
   pull_request:
     branches: [ main ]
+    paths: ['src/**', 'rustfmt.toml']
 
 jobs:
   format:
