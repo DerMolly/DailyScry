@@ -237,7 +237,10 @@ fn name_and_mana_cost(builder: &mut Builder, card_or_face: &CardOrFace) {
     let mana_cost: String;
     match card_or_face {
         &CardOrFace::Card(card) => {
-            name = card.name.clone();
+            name = match card.flavor_name.clone() {
+                Some(flavor_name) => format!("{} ({})", flavor_name, card.name.clone()),
+                None => card.name.clone(),
+            };
             mana_cost = card.mana_cost.clone().unwrap_or_default();
         }
         &CardOrFace::Face(face) => {
@@ -995,5 +998,90 @@ mod tests {
             expected_string
         );
         assert_eq!(None, get_artist(&case_of_the_filched_falcon).unwrap());
+    }
+
+    #[tokio::test]
+    async fn test_format_negan_the_cold_blooded() {
+        let expected_string = "Negan, the Cold-Blooded (Malik, Grim Manipulator)\t{2}{R}{W}{B}\n\
+        Legendary Creature — Human Rogue\n\
+        When Malik, Grim Manipulator enters the battlefield, you and target opponent each secretly choose a creature that player controls. Then those choices are revealed, and that player sacrifices those creatures.\n\
+        Whenever an opponent sacrifices a creature, you create a Treasure token.\n\
+        \n\
+        4/3\n\
+        \n\
+        Illustrated by Jake Murray".to_owned();
+        let negan_the_cold_blooded =
+            Card::scryfall_id("35d03f86-5219-4456-8136-802699ff26d3".parse().unwrap())
+                .await
+                .unwrap();
+        assert_eq!(
+            format_card(&negan_the_cold_blooded).unwrap()[0],
+            expected_string
+        );
+        assert_eq!(None, get_artist(&negan_the_cold_blooded).unwrap());
+    }
+
+    #[tokio::test]
+    async fn test_format_malik_grim_manipulator() {
+        let expected_string = "Malik, Grim Manipulator\t{2}{R}{W}{B}\n\
+        Legendary Creature — Human Rogue\n\
+        When Malik, Grim Manipulator enters the battlefield, you and target opponent each secretly choose a creature that player controls. Then those choices are revealed, and that player sacrifices those creatures.\n\
+        Whenever an opponent sacrifices a creature, you create a Treasure token.\n\
+        \n\
+        4/3\n\
+        \n\
+        Illustrated by Joshua Raphael".to_owned();
+        let malik_grim_manipulator =
+            Card::scryfall_id("5cf4fee3-3059-4ca4-a47d-0848410b294d".parse().unwrap())
+                .await
+                .unwrap();
+        assert_eq!(
+            format_card(&malik_grim_manipulator).unwrap()[0],
+            expected_string
+        );
+        assert_eq!(None, get_artist(&malik_grim_manipulator).unwrap());
+    }
+
+    #[tokio::test]
+    async fn test_format_spacegodzilla_death_corona() {
+        let expected_string = "Spacegodzilla, Death Corona (Void Beckoner)\t{6}{B}{B}\n\
+        Creature — Nightmare Horror\n\
+        Deathtouch\n\
+        Cycling {2}{B} ({2}{B}, Discard this card: Draw a card.)\n\
+        When you cycle Void Beckoner, put a deathtouch counter on target creature you control.\n\
+        \n\
+        8/8\n\
+        \n\
+        Illustrated by Zezhou Chen"
+            .to_owned();
+        let spacegodzilla_death_corona =
+            Card::scryfall_id("1ca7065e-88c1-44bb-ac68-e6e1df9e0726".parse().unwrap())
+                .await
+                .unwrap();
+        assert_eq!(
+            format_card(&spacegodzilla_death_corona).unwrap()[0],
+            expected_string
+        );
+        assert_eq!(None, get_artist(&spacegodzilla_death_corona).unwrap());
+    }
+
+    #[tokio::test]
+    async fn test_format_void_beckoner() {
+        let expected_string = "Void Beckoner\t{6}{B}{B}\n\
+        Creature — Nightmare Horror\n\
+        Deathtouch\n\
+        Cycling {2}{B} ({2}{B}, Discard this card: Draw a card.)\n\
+        When you cycle Void Beckoner, put a deathtouch counter on target creature you control.\n\
+        \n\
+        8/8\n\
+        \n\
+        Illustrated by Daarken"
+            .to_owned();
+        let void_beckoner =
+            Card::scryfall_id("a1523cda-c47d-4419-a5d3-fd6ed9867c56".parse().unwrap())
+                .await
+                .unwrap();
+        assert_eq!(format_card(&void_beckoner).unwrap()[0], expected_string);
+        assert_eq!(None, get_artist(&void_beckoner).unwrap());
     }
 }
