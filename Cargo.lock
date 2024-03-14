@@ -874,15 +874,14 @@ checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 
 [[package]]
 name = "megalodon"
-version = "0.13.1"
+version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4572a9cf810804ff564f51fcd7fa2f970ca131e070de891c929c78e86b30ef41"
+checksum = "035e3c4608ea45439f537c275a94606d2f13421252b1ea7008a9fb05ce87e7d4"
 dependencies = [
  "async-trait",
  "chrono",
  "futures-util",
  "hex",
- "log",
  "oauth2",
  "rand",
  "regex",
@@ -894,6 +893,7 @@ dependencies = [
  "tokio",
  "tokio-tungstenite",
  "tokio-util",
+ "tracing",
  "url",
  "urlencoding",
  "uuid",
@@ -1932,7 +1932,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3523ab5a71916ccf420eebdf5521fcef02141234bbc0b8a49f2fdc4544364ef"
 dependencies = [
  "pin-project-lite",
+ "tracing-attributes",
  "tracing-core",
+]
+
+[[package]]
+name = "tracing-attributes"
+version = "0.1.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34704c8d6ebcbc939824180af020566b01a7c01f80641264eba0999f6c2b6be7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.51",
 ]
 
 [[package]]
