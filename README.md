@@ -4,8 +4,10 @@ This bot allows you to post a random image from [Scryfall][scryfall] to an array
 services e.g Mastodon, Telegram or locally.
 
 Posts of this bot can be found at
-  - <a rel="me" href="https://botsin.space/@dailyscry">https://botsin.space/@dailyscry</a>
-  - <https://telegram.me/DailyScry>
+
+- <a rel="me" href="https://botsin.space/@dailyscry">![Follow @dailyscry@botsin.space](https://fedi-badge.deno.dev/@dailyscry@botsin.space/followers.svg)</a>
+- <https://telegram.me/DailyScry>
+
 ## Installation
 
 ### cargo
