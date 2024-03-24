@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+use image::{imageops::rotate90, io::Reader};
 use scryfall::card::{Card, Layout};
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
@@ -49,6 +50,25 @@ pub async fn download_images(config: &DailyScryConfig, card: &Card) -> Result<Ve
 async fn download_single_image(config: &DailyScryConfig, card: &Card) -> Result<Vec<PathBuf>> {
     let image_uris: Result<Url> = Ok(card.image_uris.clone().ok_or(Error::ImageNotFound)?.png);
     let file_location = download_file(config, image_uris, None).await?;
+
+    let mut should_rotate = false;
+    let layout = card.layout.clone();
+
+    if layout == Layout::Planar {
+        should_rotate = true;
+    }
+
+    if layout == Layout::Split {
+        let oracle_text_second_face = card.card_faces.clone().unwrap()[1].oracle_text.clone().unwrap();
+        if !oracle_text_second_face.contains("Aftermath") {
+            should_rotate = true;
+        }
+    }
+
+    if should_rotate {
+        rotate_image(file_location.clone())?;
+    }
+
     Ok(vec![file_location])
 }
 
@@ -68,6 +88,11 @@ async fn download_multiple_images(config: &DailyScryConfig, card: &Card) -> Resu
                 .unwrap()
         }))
         .await;
+
+    if card.type_line.clone().unwrap().contains("Siege") {
+        rotate_image(image_paths[0].clone())?;
+    }
+
     Ok(image_paths)
 }
 
@@ -83,4 +108,12 @@ async fn download_file(
     let mut content = Cursor::new(response.bytes().await?);
     std::io::copy(&mut content, &mut file)?;
     Ok(path)
+}
+
+fn rotate_image(image_path: PathBuf) -> Result<()> {
+    let reader = Reader::open(image_path.clone())?;
+    let dyn_img = reader.decode()?;
+    let rotated_image = rotate90(&dyn_img);
+    rotated_image.save(image_path)?;
+    Ok(())
 }

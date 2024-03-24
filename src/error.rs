@@ -31,6 +31,9 @@ pub enum Error {
 
     #[snafu(display("Unable to upload file {}", file_name))]
     ImageUploadFailed { file_name: String },
+
+    #[snafu(display("Can't rotate image"))]
+    ImageRotationFailed,
 }
 
 impl From<reqwest::Error> for Error {
@@ -60,6 +63,12 @@ impl From<megalodon::error::Error> for Error {
 impl From<teloxide_core::RequestError> for Error {
     fn from(error: teloxide_core::RequestError) -> Self {
         Error::TeloxideError { error: error }
+    }
+}
+
+impl From<image::ImageError> for Error {
+    fn from(_: image::ImageError) -> Self {
+        Error::ImageRotationFailed
     }
 }
 
