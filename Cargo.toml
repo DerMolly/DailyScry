@@ -24,7 +24,7 @@ dotenv = "0.15.0"
 image = "0.25.0"
 
 [dependencies.clap]
-version = "4.5.3"
+version = "4.5.4"
 features = ["derive"]
 
 [dependencies.reqwest]
