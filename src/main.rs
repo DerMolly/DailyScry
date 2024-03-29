@@ -46,6 +46,7 @@ async fn main() -> Result<()> {
             artist.clone().unwrap_or_default(),
             link
         );
+        return Ok(());
     }
 
     if cli_config.dry_run {

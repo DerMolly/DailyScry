@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - rotate cards that are formatted vertically
+- prevenet image download if only the text output is requested
 
 ## [1.1.1] - 2024-03-12
 
