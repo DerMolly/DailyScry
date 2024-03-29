@@ -11,6 +11,7 @@ use crate::error::{Error, Result};
 use dotenv::dotenv;
 use log::{debug, error};
 use std::process;
+use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct DailyScryConfig {
@@ -19,6 +20,7 @@ pub struct DailyScryConfig {
     pub telegram_token: Option<String>,
     pub telegram_chat_id: Option<String>,
     pub image_path: String,
+    pub ignored_oracle_ids: Vec<Uuid>,
     pub version: String,
 }
 
@@ -43,6 +45,11 @@ impl DailyScryConfig {
             mastodon_access_token: std::env::var("DAILY_SCRY_MASTODON_ACCESS_TOKEN").ok(),
             telegram_token: std::env::var("DAILY_SCRY_TELEGRAM_TOKEN").ok(),
             telegram_chat_id: std::env::var("DAILY_SCRY_TELEGRAM_CHAT_ID").ok(),
+            ignored_oracle_ids: std::env::var("DAILY_SCRY_IGNORED_ORACLE_IDS")
+                .unwrap_or("".to_owned())
+                .split(",")
+                .map(|string_value| string_value.parse().unwrap())
+                .collect(),
             image_path: String::from("/tmp"),
             version: env!("CARGO_PKG_VERSION").to_owned(),
         });
