@@ -5,7 +5,7 @@ services e.g Mastodon, Telegram or locally.
 
 Posts of this bot can be found at
 
-- <a rel="me" href="https://botsin.space/@dailyscry">![Follow @dailyscry@botsin.space](https://fedi-badge.deno.dev/@dailyscry@botsin.space/followers.svg)</a>
+- <a rel="me" href="https://botsin.space/@dailyscry">@dailyscry@botsin.space</a>
 - <https://telegram.me/DailyScry>
 
 ## Installation
