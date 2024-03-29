@@ -59,7 +59,10 @@ async fn download_single_image(config: &DailyScryConfig, card: &Card) -> Result<
     }
 
     if layout == Layout::Split {
-        let oracle_text_second_face = card.card_faces.clone().unwrap()[1].oracle_text.clone().unwrap();
+        let oracle_text_second_face = card.card_faces.clone().unwrap()[1]
+            .oracle_text
+            .clone()
+            .unwrap();
         if !oracle_text_second_face.contains("Aftermath") {
             should_rotate = true;
         }
