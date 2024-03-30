@@ -19,7 +19,12 @@ pub async fn random_card(config: &DailyScryConfig) -> Result<Card> {
             break;
         }
         let oracle_id = oracle_id_option.unwrap();
-        if !config.ignored_oracle_ids.contains(&oracle_id) {
+        if !(config
+            .ignored_oracle_ids
+            .clone()
+            .unwrap()
+            .contains(&oracle_id))
+        {
             break;
         }
         println!("random card '{}' will be ignored ", card.clone().name);
