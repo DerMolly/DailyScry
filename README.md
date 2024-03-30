@@ -53,6 +53,7 @@ Author: Philip Molares <philip.molares@udo.edu>
 | `DAILY_SCRY_MASTODON_ACCESS_TOKEN` | The access token for your application.                          							         | 
 | `DAILY_SCRY_TELEGRAM_TOKEN`        | The telegram bot token you can get from [@BotFather][botfather]                                                           |
 | `DAILY_SCRY_TELEGRAM_CHAT_ID`      | The chat id where the bot should post its message. This can be determinded with [@username_to_id_bot][username_to_id_bot] |
+| `DAILY_SCRY_IGNORED_ORACLE_IDS`    | List of oracle_ids that should be ignored and not be randomly selected. Items should be seperated by `,` |
 
 [scryfall]: https://scryfall.com
 [releases]: https://github.com/DerMolly/DailyScry/releases

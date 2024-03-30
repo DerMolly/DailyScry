@@ -30,6 +30,7 @@ async fn main() -> Result<()> {
     }
 
     let config = DailyScryConfig::new();
+    config.validate()?;
 
     let card = card::random_card(&config).await?;
 
