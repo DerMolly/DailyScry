@@ -367,7 +367,6 @@ fn vanguard_stats(builder: &mut Builder, card_or_face: &CardOrFace) {
 
 #[cfg(test)]
 mod tests {
-    // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
     #[tokio::test]

@@ -20,6 +20,7 @@ mod format;
 mod image;
 mod mastodon;
 mod telegram;
+mod util;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
@@ -119,12 +120,14 @@ async fn post_to_mastodon(
     link: &str,
 ) -> Result<()> {
     debug!("creatiung mastodon post…");
-    let output = mastodon::post(&config, card_texts, artist, image_paths, link).await?;
+    let outputs = mastodon::post(&config, card_texts, artist, image_paths, link).await?;
 
-    match output {
-        PostStatusOutput::Status(status) => println!("Posted: {}", status.url.unwrap()),
-        PostStatusOutput::ScheduledStatus(scheduled_status) => {
-            println!("Will post at {}", scheduled_status.scheduled_at)
+    for output in outputs {
+        match output {
+            PostStatusOutput::Status(status) => println!("Posted: {}", status.url.unwrap()),
+            PostStatusOutput::ScheduledStatus(scheduled_status) => {
+                println!("Will post at {}", scheduled_status.scheduled_at)
+            }
         }
     }
     Ok(())
