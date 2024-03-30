@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - new environment variable `DAILY_SCRY_IGNORED_ORACLE_IDS`. All oracle_id (seperated by `,`) in it will trigger a new random card, if chosen.
+- handle character limit for telegram and mastodon
 
 ### Changed
 

@@ -11,6 +11,7 @@ use megalodon::{entities, error, generator, Megalodon};
 
 use crate::config::DailyScryConfig;
 use crate::error::{Error, Result};
+use crate::util::{split_text, Additional};
 
 pub async fn post(
     config: &DailyScryConfig,
@@ -18,14 +19,21 @@ pub async fn post(
     artist: Option<String>,
     images: Vec<PathBuf>,
     link: &str,
-) -> Result<PostStatusOutput> {
+) -> Result<Vec<PostStatusOutput>> {
     let client = create_client(config).await?;
 
-    let status = format!(
-        "{}{}\n{}\n#MagicTheGathering #DailyScry",
-        card_texts.join("\n"),
-        artist.unwrap_or_default(),
-        link,
+    let text = card_texts.join("\n");
+    let hashtags = "\n#MagicTheGathering #DailyScry".to_owned();
+    let artist = format!("\n{}", artist.unwrap_or_default());
+
+    let splitted_texts = split_text(
+        text,
+        config.mastodon_character_limit.unwrap(),
+        vec![
+            Additional::Text(hashtags.clone()),
+            Additional::Text(artist.clone()),
+            Additional::Number(23), // This is for the link as links in mastodon always take up 23 characters See: https://docs.joinmastodon.org/user/posting/#links
+        ],
     );
 
     let images_and_texts = images.iter().zip(card_texts.iter());
@@ -38,9 +46,32 @@ pub async fn post(
         .into_iter()
         .collect::<std::result::Result<Vec<_>, megalodon::error::Error>>()?;
 
-    post_status(&client, &status, Some(media_ids))
+    let status = format!("{}{}{}{}", splitted_texts[0], artist, link, hashtags);
+
+    let result = post_status(&client, &status, Some(media_ids), None)
         .await
-        .map_err(|error| Error::MegalodonError { error: error })
+        .map_err(|error| Error::MegalodonError { error: error })?;
+
+    let mut reply_id = match result.clone() {
+        PostStatusOutput::Status(status) => status.id,
+        PostStatusOutput::ScheduledStatus(_) => "".to_owned(),
+    };
+
+    let mut results = vec![result];
+
+    for splitted_text in splitted_texts.into_iter().skip(1) {
+        let additional_status = format!("{}{}{}{}", splitted_text, artist, link, hashtags);
+        let additional_result = post_status(&client, &additional_status, None, Some(reply_id))
+            .await
+            .map_err(|error| Error::MegalodonError { error: error })?;
+        reply_id = match additional_result.clone() {
+            PostStatusOutput::Status(status) => status.id,
+            PostStatusOutput::ScheduledStatus(_) => "".to_owned(),
+        };
+        results.push(additional_result);
+    }
+
+    return Ok(results);
 }
 
 async fn create_client(config: &DailyScryConfig) -> Result<Box<dyn Megalodon + Send + Sync>> {
@@ -122,6 +153,7 @@ async fn post_status(
     client: &Box<dyn megalodon::Megalodon + Send + Sync>,
     status: &str,
     media_ids: Option<Vec<String>>,
+    in_reply_to_id: Option<String>,
 ) -> std::result::Result<megalodon::megalodon::PostStatusOutput, megalodon::error::Error> {
     let res = client
         .post_status(
@@ -130,6 +162,7 @@ async fn post_status(
                 media_ids: media_ids,
                 sensitive: Some(false),
                 visibility: Some(entities::StatusVisibility::Public),
+                in_reply_to_id: in_reply_to_id,
                 language: Some("en".to_string()),
                 ..Default::default()
             }),

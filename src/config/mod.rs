@@ -17,15 +17,17 @@ use uuid::Uuid;
 pub struct DailyScryConfig {
     pub mastodon_url: Option<String>,
     pub mastodon_access_token: Option<String>,
+    pub mastodon_character_limit: Option<usize>,
     pub telegram_token: Option<String>,
     pub telegram_chat_id: Option<String>,
+    pub telegram_character_limit: Option<usize>,
     pub image_path: String,
     pub ignored_oracle_ids: Option<Vec<Uuid>>,
     pub version: String,
 }
 
 impl DailyScryConfig {
-    pub fn new() -> DailyScryConfig {
+    pub fn new() -> Self {
         dotenv().ok();
         return match DailyScryConfig::load_config() {
             Err(error) => {
@@ -49,8 +51,16 @@ impl DailyScryConfig {
         return Ok(DailyScryConfig {
             mastodon_url: std::env::var("DAILY_SCRY_MASTODON_URL").ok(),
             mastodon_access_token: std::env::var("DAILY_SCRY_MASTODON_ACCESS_TOKEN").ok(),
+            mastodon_character_limit: std::env::var("DAILY_SCRY_MASTODON_CHARCTER_LIMIT")
+                .unwrap_or("500".to_owned())
+                .parse()
+                .ok(),
             telegram_token: std::env::var("DAILY_SCRY_TELEGRAM_TOKEN").ok(),
             telegram_chat_id: std::env::var("DAILY_SCRY_TELEGRAM_CHAT_ID").ok(),
+            telegram_character_limit: std::env::var("DAILY_SCRY_TELEGRAM_CHARCTER_LIMIT")
+                .unwrap_or("4096".to_owned())
+                .parse()
+                .ok(),
             ignored_oracle_ids: if oracle_ids_env.is_empty() {
                 Some(vec![])
             } else {
@@ -89,6 +99,12 @@ impl DailyScryConfig {
             });
         }
 
+        if self.mastodon_character_limit.is_none() {
+            return Err(Error::ReadConfiguration {
+                key: "DAILY_SCRY_MASTODON_CHARCTER_LIMIT".to_string(),
+            });
+        }
+
         Ok(())
     }
 
@@ -102,6 +118,12 @@ impl DailyScryConfig {
         if self.telegram_chat_id.is_none() {
             return Err(Error::ReadConfiguration {
                 key: "DAILY_SCRY_TELEGRAM_CHAT_ID".to_string(),
+            });
+        }
+
+        if self.telegram_character_limit.is_none() {
+            return Err(Error::ReadConfiguration {
+                key: "DAILY_SCRY_TELEGRAM_CHARCTER_LIMIT".to_string(),
             });
         }
 
@@ -136,6 +158,8 @@ mod tests {
                 assert_eq!(config.mastodon_access_token.unwrap(), mastodon_access_token);
                 assert_eq!(config.telegram_token.unwrap(), telegram_token);
                 assert_eq!(config.telegram_chat_id.unwrap(), telegram_chat_id);
+                assert_eq!(config.mastodon_character_limit.unwrap(), 500);
+                assert_eq!(config.telegram_character_limit.unwrap(), 4096);
                 assert_eq!(config.ignored_oracle_ids.unwrap().len(), 0);
             },
         );
@@ -209,6 +233,197 @@ mod tests {
                 || {
                     let config = DailyScryConfig::load_config().unwrap();
                     assert_eq!(config.validate().is_err(), true);
+                },
+            );
+        }
+    }
+
+    #[cfg(test)]
+    mod check_mastodon_config {
+        use super::super::*;
+
+        #[test]
+        fn test_works() {
+            let mastodon_url = "test_mastodon_url";
+            let mastodon_access_token = "test_mastodon_access_token";
+            let mastodon_character_limit = "1";
+            temp_env::with_vars(
+                [
+                    ("DAILY_SCRY_MASTODON_URL", Some(mastodon_url)),
+                    (
+                        "DAILY_SCRY_MASTODON_ACCESS_TOKEN",
+                        Some(mastodon_access_token),
+                    ),
+                    (
+                        "DAILY_SCRY_MASTODON_CHARCTER_LIMIT",
+                        Some(mastodon_character_limit),
+                    ),
+                ],
+                || {
+                    let config = DailyScryConfig::load_config().unwrap();
+                    assert_eq!(config.mastodon_url.clone().unwrap(), mastodon_url);
+                    assert_eq!(
+                        config.mastodon_access_token.clone().unwrap(),
+                        mastodon_access_token
+                    );
+                    assert_eq!(config.mastodon_character_limit.clone().unwrap(), 1);
+                    assert_eq!(config.check_mastodon_config().is_ok(), true);
+                },
+            );
+        }
+
+        #[test]
+        fn test_url_fail() {
+            let mastodon_access_token = "test_mastodon_access_token";
+            let mastodon_character_limit = "not_a_number";
+            temp_env::with_vars(
+                [
+                    ("DAILY_SCRY_MASTODON_URL", None),
+                    (
+                        "DAILY_SCRY_MASTODON_ACCESS_TOKEN",
+                        Some(mastodon_access_token),
+                    ),
+                    (
+                        "DAILY_SCRY_MASTODON_CHARCTER_LIMIT",
+                        Some(mastodon_character_limit),
+                    ),
+                ],
+                || {
+                    let config = DailyScryConfig::load_config().unwrap();
+                    assert_eq!(config.check_mastodon_config().is_err(), true);
+                },
+            );
+        }
+
+        #[test]
+        fn test_access_token_fail() {
+            let mastodon_url = "test_mastodon_url";
+            let mastodon_character_limit = "not_a_number";
+            temp_env::with_vars(
+                [
+                    ("DAILY_SCRY_MASTODON_URL", Some(mastodon_url)),
+                    ("DAILY_SCRY_MASTODON_ACCESS_TOKEN", None),
+                    (
+                        "DAILY_SCRY_MASTODON_CHARCTER_LIMIT",
+                        Some(mastodon_character_limit),
+                    ),
+                ],
+                || {
+                    let config = DailyScryConfig::load_config().unwrap();
+                    assert_eq!(config.check_mastodon_config().is_err(), true);
+                },
+            );
+        }
+
+        #[test]
+        fn test_character_limit_fail() {
+            let mastodon_url = "test_mastodon_url";
+            let mastodon_access_token = "test_mastodon_access_token";
+            let mastodon_character_limit = "not_a_number";
+            temp_env::with_vars(
+                [
+                    ("DAILY_SCRY_MASTODON_URL", Some(mastodon_url)),
+                    (
+                        "DAILY_SCRY_MASTODON_ACCESS_TOKEN",
+                        Some(mastodon_access_token),
+                    ),
+                    (
+                        "DAILY_SCRY_MASTODON_CHARCTER_LIMIT",
+                        Some(mastodon_character_limit),
+                    ),
+                ],
+                || {
+                    let config = DailyScryConfig::load_config().unwrap();
+                    assert_eq!(config.check_mastodon_config().is_err(), true);
+                },
+            );
+        }
+    }
+
+    mod check_telegram_config {
+        use super::super::*;
+
+        #[test]
+        fn test_works() {
+            let telegram_token = "test_telegram_token";
+            let telegram_chat_id = "test_telegram_chat_id";
+            let telegram_character_limit = "2";
+            temp_env::with_vars(
+                [
+                    ("DAILY_SCRY_TELEGRAM_TOKEN", Some(telegram_token)),
+                    ("DAILY_SCRY_TELEGRAM_CHAT_ID", Some(telegram_chat_id)),
+                    (
+                        "DAILY_SCRY_TELEGRAM_CHARCTER_LIMIT",
+                        Some(telegram_character_limit),
+                    ),
+                ],
+                || {
+                    let config = DailyScryConfig::new();
+                    assert_eq!(config.telegram_token.clone().unwrap(), telegram_token);
+                    assert_eq!(config.telegram_chat_id.clone().unwrap(), telegram_chat_id);
+                    assert_eq!(config.telegram_character_limit.clone().unwrap(), 2);
+                    assert_eq!(config.check_telegram_config().is_ok(), true);
+                },
+            )
+        }
+
+        #[test]
+        fn test_token_fail() {
+            let telegram_chat_id = "test_telegram_chat_id";
+            let telegram_character_limit = "2";
+            temp_env::with_vars(
+                [
+                    ("DAILY_SCRY_TELEGRAM_TOKEN", None),
+                    ("DAILY_SCRY_TELEGRAM_CHAT_ID", Some(telegram_chat_id)),
+                    (
+                        "DAILY_SCRY_TELEGRAM_CHARCTER_LIMIT",
+                        Some(telegram_character_limit),
+                    ),
+                ],
+                || {
+                    let config = DailyScryConfig::load_config().unwrap();
+                    assert_eq!(config.check_telegram_config().is_err(), true);
+                },
+            );
+        }
+
+        #[test]
+        fn test_chat_id_fail() {
+            let telegram_token = "test_telegram_token";
+            let telegram_character_limit = "not_a_number";
+            temp_env::with_vars(
+                [
+                    ("DAILY_SCRY_TELEGRAM_TOKEN", Some(telegram_token)),
+                    ("DAILY_SCRY_TELEGRAM_CHAT_ID", None),
+                    (
+                        "DAILY_SCRY_TELEGRAM_CHARCTER_LIMIT",
+                        Some(telegram_character_limit),
+                    ),
+                ],
+                || {
+                    let config = DailyScryConfig::load_config().unwrap();
+                    assert_eq!(config.check_telegram_config().is_err(), true);
+                },
+            );
+        }
+
+        #[test]
+        fn test_character_limit_fail() {
+            let telegram_token = "test_telegram_token";
+            let telegram_chat_id = "test_telegram_chat_id";
+            let telegram_character_limit = "not_a_number";
+            temp_env::with_vars(
+                [
+                    ("DAILY_SCRY_TELEGRAM_TOKEN", Some(telegram_token)),
+                    ("DAILY_SCRY_TELEGRAM_CHAT_ID", Some(telegram_chat_id)),
+                    (
+                        "DAILY_SCRY_TELEGRAM_CHARCTER_LIMIT",
+                        Some(telegram_character_limit),
+                    ),
+                ],
+                || {
+                    let config = DailyScryConfig::load_config().unwrap();
+                    assert_eq!(config.check_telegram_config().is_err(), true);
                 },
             );
         }
