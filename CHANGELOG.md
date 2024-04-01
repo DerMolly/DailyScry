@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
-## Unreleased
+## [1.2.0] - 2024-04-01
 
 ### Added
 
@@ -15,6 +15,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - rotate cards that are formatted vertically
 - prevenet image download if only the text output is requested
+- Update dependencies:
+  - megalodon  0.13.2
+  - clap 4.5.4
+  - reqwest 0.12,
+  - tokio 1.37.0
+  - image 0.25.1
 
 ## [1.1.1] - 2024-03-12
 
@@ -52,6 +58,7 @@ This is the initial release of the software.
 - `--quiet`: Removes all logging output (normal outputs will still be shown)
 - `--dry-run`: This option prevents actual posting to anything, but stdout
 
+[1.2.0]: https://github.com/DerMolly/DailyScry/compare/v1.1.1...main
 [1.1.1]: https://github.com/DerMolly/DailyScry/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/DerMolly/DailyScry/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/DerMolly/DailyScry/releases/tag/v1.0.0
