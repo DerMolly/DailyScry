@@ -58,7 +58,7 @@ This is the initial release of the software.
 - `--quiet`: Removes all logging output (normal outputs will still be shown)
 - `--dry-run`: This option prevents actual posting to anything, but stdout
 
-[1.2.0]: https://github.com/DerMolly/DailyScry/compare/v1.1.1...main
+[1.2.0]: https://github.com/DerMolly/DailyScry/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/DerMolly/DailyScry/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/DerMolly/DailyScry/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/DerMolly/DailyScry/releases/tag/v1.0.0
