@@ -2130,9 +2130,9 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "scryfall"
-version = "0.16.1"
+version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "347ff5e853d4846011e562a2aed63303d079f71a89801a37ab105ed81ddeab1e"
+checksum = "9cec4d0e48c2b8b9499758e8de06e1496a038c6eab410cd1f79157fbb7aa2a8f"
 dependencies = [
  "async-trait",
  "cfg-if",
