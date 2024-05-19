@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2024 Philip Molares <philip.molares@udo.edu>
+#
+# SPDX-License-Identifier: MIT
+
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+    paths: ['src/**']
+  pull_request:
+    branches: [ main ]
+    paths: ['src/**']
+
+jobs:
+  format:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        - name: Setup rust
+          uses: ./.github/actions/setup-rust
+          with:
+            RUST_VERSION: stable
+        - name: Run build
+          run: cargo build
