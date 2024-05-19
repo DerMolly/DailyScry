@@ -48,7 +48,12 @@ pub async fn download_images(config: &DailyScryConfig, card: &Card) -> Result<Ve
 }
 
 async fn download_single_image(config: &DailyScryConfig, card: &Card) -> Result<Vec<PathBuf>> {
-    let image_uris: Result<Url> = Ok(card.image_uris.clone().ok_or(Error::ImageNotFound)?.png);
+    let image_uris: Result<Url> = card
+        .image_uris
+        .clone()
+        .ok_or(Error::ImageNotFound)?
+        .png
+        .ok_or(Error::ImageNotFound);
     let file_location = download_file(config, image_uris, None).await?;
 
     let mut should_rotate = false;
