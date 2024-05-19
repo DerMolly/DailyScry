@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+use crate::card::DefaultRandomCardGetter;
 use crate::config::cli_config::CLIConfig;
 use crate::config::DailyScryConfig;
 use crate::error::Result;
@@ -33,7 +34,7 @@ async fn main() -> Result<()> {
     let config = DailyScryConfig::new();
     config.validate()?;
 
-    let card = card::random_card(&config).await?;
+    let card = card::random_card(&config, DefaultRandomCardGetter()).await?;
 
     let link = link(&card);
 
