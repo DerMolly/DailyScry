@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-use crate::card::filter::{CardFilter, IgnoredOracleIdFilter};
+use crate::card::filter::{CardFilter, ContentWarningFilter, IgnoredOracleIdFilter};
 use crate::card::random::RandomCardGetter;
 use crate::config::DailyScryConfig;
 use crate::error::Result;
@@ -22,9 +22,8 @@ pub async fn random_card<T: RandomCardGetter>(
     mut random_card_getter: T,
 ) -> Result<Card> {
     debug!("calling scryfall to get random card…");
-    let filters_vec: Vec<&dyn CardFilter> = vec![
-        &IgnoredOracleIdFilter {},
-    ];
+    let filters_vec: Vec<&dyn CardFilter> =
+        vec![&IgnoredOracleIdFilter {}, &ContentWarningFilter {}];
     let filters = filters_vec.into_iter();
 
     let mut card: Card;
@@ -74,7 +73,7 @@ mod tests {
         pub fn new(cards: Vec<Card>) -> Self {
             TestCardGetter {
                 call_index: 0,
-                cards: cards, 
+                cards: cards,
             }
         }
     }
@@ -82,7 +81,9 @@ mod tests {
     impl RandomCardGetter for TestCardGetter {
         async fn get_random_card(&mut self) -> Result<Card> {
             if self.call_index >= self.cards.len() {
-                return Err(Error::ScryfallError { error: scryfall::Error::Other("TooManyRequest to get_random_card".to_owned())})
+                return Err(Error::ScryfallError {
+                    error: scryfall::Error::Other("TooManyRequest to get_random_card".to_owned()),
+                });
             }
             let card = self.cards[self.call_index].clone();
             self.call_index += 1;
@@ -91,9 +92,8 @@ mod tests {
     }
 
     fn build_config(ignored_oracle_id: Option<&str>) -> DailyScryConfig {
-        let ignored_oracle_ids = ignored_oracle_id.map(|oracle_id| {
-            vec![oracle_id.parse().unwrap()]
-        });
+        let ignored_oracle_ids =
+            ignored_oracle_id.map(|oracle_id| vec![oracle_id.parse().unwrap()]);
         DailyScryConfig {
             mastodon_url: None,
             mastodon_access_token: None,
@@ -112,8 +112,12 @@ mod tests {
         let config = build_config(Some("56719f6a-1a6c-4c0a-8d21-18f7d7350b68"));
 
         let card_getter = TestCardGetter::new(vec![
-            Card::scryfall_id("ddaa0be1-7358-4ea2-8c40-be6d699a6631".parse().unwrap()).await.unwrap(),
-            Card::scryfall_id("b0faa7f2-b547-42c4-a810-839da50dadfe".parse().unwrap()).await.unwrap(),
+            Card::scryfall_id("ddaa0be1-7358-4ea2-8c40-be6d699a6631".parse().unwrap())
+                .await
+                .unwrap(),
+            Card::scryfall_id("b0faa7f2-b547-42c4-a810-839da50dadfe".parse().unwrap())
+                .await
+                .unwrap(),
         ]);
 
         let card = random_card(&config, card_getter).await.unwrap();
@@ -124,11 +128,30 @@ mod tests {
     async fn test_ignored_oracle_id_no_ids_ignored() {
         let config = build_config(None);
 
-        let card_getter = TestCardGetter::new(vec![
-            Card::scryfall_id("ddaa0be1-7358-4ea2-8c40-be6d699a6631".parse().unwrap()).await.unwrap(),
-        ]);
+        let card_getter = TestCardGetter::new(vec![Card::scryfall_id(
+            "ddaa0be1-7358-4ea2-8c40-be6d699a6631".parse().unwrap(),
+        )
+        .await
+        .unwrap()]);
 
         let card = random_card(&config, card_getter).await.unwrap();
         assert_eq!(card.name, "Swamp")
+    }
+
+    #[tokio::test]
+    async fn test_content_warning() {
+        let config = build_config(Some("56719f6a-1a6c-4c0a-8d21-18f7d7350b68"));
+
+        let card_getter = TestCardGetter::new(vec![
+            Card::scryfall_id("b6c7705a-2987-4ef1-92b1-2c55d989ec6f".parse().unwrap())
+                .await
+                .unwrap(),
+            Card::scryfall_id("b0faa7f2-b547-42c4-a810-839da50dadfe".parse().unwrap())
+                .await
+                .unwrap(),
+        ]);
+
+        let card = random_card(&config, card_getter).await.unwrap();
+        assert_eq!(card.name, "Black Lotus")
     }
 }
