@@ -13,7 +13,7 @@ jobs:
     name: post
     runs-on: ubuntu-latest
     steps:
-      - uses: robinraju/release-downloader@v1.10
+      - uses: robinraju/release-downloader@v1.11
         with:
           latest: true
           fileName: "daily_scry"
